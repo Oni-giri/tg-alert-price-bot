@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  crypto-alert-bot:
+    build: .
+    container_name: crypto-alert-bot
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - DATABASE_PATH=/app/data/crypto_bot.db
+      - LOG_FILE=/app/logs/app.log
+      - PRICE_CHECK_INTERVAL_MINUTES=5
+      - ALERT_COOLDOWN_MINUTES=30
+      - LOG_LEVEL=info
+      - MAX_COMMANDS_PER_MINUTE=10
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
