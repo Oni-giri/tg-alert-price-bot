@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  crypto-alert-bot-dev:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    container_name: crypto-alert-bot-dev
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - DATABASE_PATH=/app/data/crypto_bot.db
+      - LOG_FILE=/app/logs/app.log
+      - PRICE_CHECK_INTERVAL_MINUTES=5
+      - ALERT_COOLDOWN_MINUTES=30
+      - LOG_LEVEL=debug
+      - MAX_COMMANDS_PER_MINUTE=10
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src:ro
+      - ./package.json:/app/package.json:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      - ./jest.config.js:/app/jest.config.js:ro
+      # Persistent data
+      - dev_data:/app/data
+      - dev_logs:/app/logs
+      # Node modules volume for performance
+      - dev_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  dev_data:
+  dev_logs:
+  dev_node_modules:

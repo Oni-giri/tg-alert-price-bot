@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   crypto-alert-bot:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
     container_name: crypto-alert-bot
     restart: unless-stopped
     environment:
